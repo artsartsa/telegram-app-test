@@ -1,0 +1,171 @@
+﻿/* CSS style sheet used with Epic Games HTML5 projects
+ *
+ * much of this is for UE4 development purposes.
+ *
+ * to create a custom CSS file for your project:
+ * - make a copy of this file - or make one from scratch
+ * - and put it in: "your project folder"/Build/HTML/GameX.css.template
+ */
+
+html, body, .container {
+	height: 100%;
+	font-family: "Helvetica Neue", "HelveticaNeue", Helvetica, Arial, sans-serif;
+	margin: 0px;
+	overflow-y: hidden;
+	width: 100%;
+	padding: 0;
+	
+}
+
+.h4, h4 {
+
+	font-size: 10pt;
+}
+
+.container {
+    width: 100vw; /* или 100% */
+    height: 100vh; /* или 100% */
+    margin: 0;
+    padding: 0;
+    position: absolute; /* или relative, зависит от вашего дизайна */
+    top: 0;
+    left: 0;
+}
+
+.glyphicon-spin {
+	animation: spin 2000ms infinite linear;
+}
+
+@keyframes spin {
+	0% {
+		transform: rotate(0deg);
+	}
+	100% {
+		transform: rotate(359deg);
+	}
+}
+
+@-webkit-keyframes spin {
+	0% {
+		transform: rotate(0deg);
+	}
+	100% {
+		transform: rotate(359deg);
+	}
+}
+
+.wrapper {
+	position: relative;
+	text-align: center;
+	min-width: 640px;
+	width: 100%;
+	height: 100%; /* initial height, will be dynamically adjusted at runtime */
+	max-width: 100%;
+	display: block;
+	align-items: center;
+	position: sticky;
+	text-align: center;
+	justify-content: center;
+}
+
+ .emscripten {
+	padding-right: 0;
+	margin-left: 0;
+	margin-right: 0;
+	display: stretch;
+	display: -webkit-box;
+	display: -moz-box;
+	display: box;
+
+	-webkit-box-align: center;
+	-moz-box-align: center;
+	box-align: stretch;
+
+	-webkit-box-pack: center;
+	-moz-box-pack: center;
+	box-pack: center;
+}
+
+#canvas {
+	padding-right: 0;
+	margin-left: 0;
+	margin-right: 0;
+	width: 100%;
+	height: 100%;
+}
+
+.texthalf {
+	height: 37%;
+	border: 0px;
+	padding: 0px;
+	overflow-y: hidden;
+	font-size: 2em;
+}
+
+
+
+.btn { padding: 0px; text-align: center; min-width: 150px }
+.progress { background: rgba(245, 245, 245, 1); border: 0px solid rgba(245, 245, 245, 1); border-radius: 0px; height: 4px; }
+.progress-bar-custom { background: rgba(153, 153, 153, 1); }
+.centered-axis-xy {
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%,-50%);
+}
+
+.hide {
+	display: none;
+  }
+
+
+  #loadingScreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: hwb(0 0% 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: hsl(138, 100%, 50%);
+    font-family: Arial, sans-serif;
+    z-index: 1000;
+}
+
+#loadingProgress {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+#loadingBar {
+    width: 300px;
+    height: 20px;
+    background-color: #444;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+#loadingBarFill {
+    width: 0%;
+    height: 100%;
+    background-color: #00ff00;
+    transition: width 0.3s ease;
+}
+
+#loadingSpinner {
+    border: 8px solid hwb(128 0% 4% / 0.541);
+    border-top: 8px solid #00ff00;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+    margin-bottom: 20px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
