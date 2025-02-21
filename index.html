@@ -1,343 +1,48 @@
-﻿<!-- wo_ar -->
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
+
+<!--
+     HTML code used with Epic Games HTML5 projects
+
+     much of this is for UE4 development purposes.
+
+     to create a custom HTML file for your project:
+     - make a copy of this file - or make one from scratch
+     - and put it in: "your project folder"/Build/HTML/GameX.html.template
+-->
 
 <html lang="en">
 <head>
-	<title>SpeedSenseBase</title>
+	<title>TelegramApp</title>
 	<meta charset="utf-8">
-	<meta name="viewport" content="width=100, heigh=100, initial-scale=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 
-	<!-- Yandex Games SDK -->
-	<script src="/sdk.js"></script>
+	<script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+	<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet">
 
-	<!-- Loading -->
-	 <script>
-
-	window.addEventListener('load', () => {
-    	loadingScreen.style.display = 'flex';
-	});
-
-	 </script>
-
-	<!-- Sound control -->
-	<script>
-	// Создать AudioContext
-	//const audioContext = new AudioContext();
-	//let audioContext;
-
-	// Функция для инициализации AudioContext
-	/*function initAudio() {
-    	if (!audioContext) {
-        	audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    	}
-
-    	// Если контекст был приостановлен, возобновляем его
-   		if (audioContext.state === 'suspended') {
-     	   audioContext.resume();
-    	}
-	}*/
-
-	// Добавьте слушатель на любое событие взаимодействия пользователя
-	//document.addEventListener('click', initAudio);
-	// или
-	//document.addEventListener('touchstart', initAudio);
-
-	let audioContext = null;
-
-	// Функция для инициализации AudioContext
-function initAudioContext() {
-    if (!audioContext) {
-        audioContext = new AudioContext();
-        console.log('AudioContext создан');
-    }
-}
-
-// Функция для возобновления AudioContext
-function resumeAudioContext() {
-    if (audioContext && audioContext.state === 'suspended') {
-        audioContext.resume().then(() => {
-            console.log('AudioContext возобновлён');
-        });
-    }
-}
-
-// Отслеживаем первое взаимодействие пользователя
-document.addEventListener('click', () => {
-    initAudioContext();
-    resumeAudioContext();
-}, { once: true });
-
-document.addEventListener('keydown', () => {
-    initAudioContext();
-    resumeAudioContext();
-}, { once: true });
-
-document.addEventListener('touchstart', () => {
-    initAudioContext();
-    resumeAudioContext();
-}, { once: true });
-
-// Отслеживаем взаимодействие пользователя для возобновления AudioContext
-document.addEventListener('click', resumeAudioContext);
-document.addEventListener('keydown', resumeAudioContext);
-document.addEventListener('touchstart', resumeAudioContext);
-
-
-
-let resizeTimeout;
-
-window.addEventListener('resize', () => {
-    clearTimeout(resizeTimeout);
-    resizeTimeout = setTimeout(() => {
-		Module['UE4_resizeCanvas']()
-    }, 100);
-});
-
-
-
-
-	
-	const playContiniousAudioMap = new Map();
-
-	const activeSounds = new Set();
-
-	// Загрузить аудиофайл
-	function loadAudio(url) {
-		return fetch(url)
-			.then(response => response.arrayBuffer())
-			.then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer));
-	}
-	
-	// Воспроизвести звук
-	function playAudio(buffer, volume, pitch, loop) {
-		
-		const source = audioContext.createBufferSource();
-		const gainNode = audioContext.createGain();
-		source.buffer = buffer;
-		//source.connect(audioContext.destination);
-		source.connect(gainNode);
-		gainNode.connect(audioContext.destination);
-		gainNode.gain.value = volume;
-		//source.volume = volume;
-		source.pitch = pitch;
-		source.loop = loop;
-		source.start(0);
-
-		activeSounds.add(source);
-
-    	source.onended = () => {
-        	activeSounds.delete(source);
-    	};
-	}
-
-	// Доделать настройку pitch!
-	function playNamedAudio(buffer, refName, volume, pitch, loop){
-		if(playContiniousAudioMap.has(refName)){
-			const a = playContiniousAudioMap.get(refName);
-			a.stop();
-			console.log("Stop", refName);
-		} else {
-			console.log("Cant find ", refName);
-		}
-		const source = audioContext.createBufferSource();
-		const gainNode = audioContext.createGain();
-		source.buffer = buffer;
-		source.connect(gainNode);
-		gainNode.connect(audioContext.destination);
-        gainNode.gain.value = volume;
-		//source.pitch = pitch;
-		source.loop = loop;
-		source.start(0);
-		playContiniousAudioMap.set(refName, source);
-		activeSounds.add(source);
-		if(!loop){
-			source.onended = () => {
-				activeSounds.delete(source);
-			};
-		}
-	}
-	
-	
-	function playAudioJS(url, volume, pitch, loop){
-	console.log("Play audio ", url);
-	loadAudio("Audio/" + url).then(buffer => playAudio(buffer, volume, pitch, loop))
-	}
-		
-	function playContiniousAudioJS(refName, audioName, volume, pitch, loop){
-		console.log("Set ", refName, " to ", audioName);
-		loadAudio("Audio/" + audioName).then(buffer => playNamedAudio(buffer, refName, volume, pitch, loop))
-		console.log("Continious audio started ", refName);
-	}
-
-	function modifyContiniousAudioJS(refName, override, audioName, volume, pitch, loop){
-		const source = playContiniousAudioMap.get(refName);
-		console.log(source);
-		if(source){
-			if(override){
-				loadAudio("Audio/" + audioName).then(buffer => playNamedAudio(buffer, refName, volume, pitch, loop))
-				console.log("Audio overrited for", refName);
-			} else {
-				source.volume = volume;
-				source.pitch = pitch;
-				source.loop = loop;
-				console.log("Volume and pitch updated for ", refName);
-			}
-		} else {
-			console.log("Cant modify ", refName);
-		}
-	}
-
-	function muteAllAudioJS(){
-		activeSounds.forEach(source => {
-        source.stop();
-        source.disconnect();
-    });
-    activeSounds.clear();
-	}
-
-	</script>
-	
-	<script>
-		
-		document.addEventListener("visibilitychange", function() {
-			if (document.hidden){
-				audioContext.suspend();
-				Module['resumeMainLoop']();
-				//Module["_DisableSound"]();
-				setTimeout(function() {
-					Module['resumeMainLoop']();
-					console.log('Функция выполняется в:', new Date().toISOString());
-					
-					
-				}, 100);
-				console.log("Browser tab is hidden");
-				console.log('Функция выполняется в:', new Date().toISOString());
-				
-				
-			} else {
-				//Module["_EnableSound"]();
-	
-				//Module['resumeMainLoop']();
-				console.log("Browser tab is visible");
-				//let audioContext = ue4_hacks.ctx
-				audioContext.resume();
-				//window.ue4_hacks.ctx.suspend();
-				console.log('Функция выполняется в:', new Date().toISOString());
-				setTimeout(function() {
-					console.log("Это сообщение выведено с задержкой!");
-					//let audioContext = window.ue4_hacks.ctx;
-					//audioContext.suspend();
-					//Module["_EnableSound"]();
-				}, 500);
-			}
-		});
-	</script>
-
-	<!-- Yandex Games SDK -->
-	<script>
-	const initGame = false;
-	
-	//const ysdk = await YaGames.init();
-
-	//ysdk.adv.showFullscreenAdv();
-
-	const pauseCallback = () => {
-    	Module['pauseMainLoop'](); // Ваша функция, останавливающая game loop и музыку.
-    	console.log('GAME PAUSED');
-		audioContext.suspend();
-	};
-
-	const resumeCallback = () => {
-    	Module['resumeMainLoop'](); // Ваша функция, возобновляющая game loop и музыку.
-    	console.log('GAME RESUMED');
-		audioContext.resume();
-		Module["_EnableSound"]();
-	};
-
-	YaGames.init().then(ysdk => {
-		ysdk.adv.showFullscreenAdv();
-		ysdk.on('game_api_pause', pauseCallback);
-		ysdk.on('game_api_resume', resumeCallback);
-		window.ysdk = ysdk;
-	}
-	)
-	
-
-
-	//window.ysdk.on('game_api_pause', pauseCallback);//YaGames.init().then(ysdk => ysdk.on('game_api_pause', pauseCallback)); // Подписка на события 'game_api_pause'.
-	//ysdk.off('game_api_pause', pauseCallback);
-
-
-
-
-	//window.ysdk.on('game_api_resume', resumeCallback);//YaGames.init().then(ysdk => ysdk.on('game_api_resume', resumeCallback)); // Подписка на события 'game_api_resume'.
-	//ysdk.off('game_api_resume', resumeCallback); // Отписка от событий 'game_api_resume'.
-
-	
-
-
-/*
-* Фулскрин
-*/
-	function notifyLoadingAPIReady(){
-		loadingScreen.style.display = 'none';
-		ysdk.features.LoadingAPI.ready();
-		audioContext.resume();
-		Module["_EnableSound"]();
-		initGame = true;
-		console.log("Ready");
-	}
-
-	document.addEventListener('visibilitychange', function () {
-            if (initGame == true) {
-                if (document.hidden) {
-                    Module['UE4_resizeCanvas']();
-                }
-                else {
-					
-                    if (ysdk.screen.fullscreen.status == 'off'){
-                        ysdk.screen.fullscreen.request();
-						setTimeout(
-							Module['UE4_resizeCanvas'](), 100)
-					}
-                }
-            }
-        });
-
-	</script>
-
-
-<link href="SpeedSenseBase.css" rel="stylesheet">
+	<link href="TelegramApp-HTML5-Shipping.css" rel="stylesheet">
 </head>
 <body>
 
-	<div id="loadingScreen">
-		<div id="loadingSpinner"></div>
-		<div id="loadingProgress">Загрузка 💀</div>
-		</div>
-	</div>
-
-	
-
 <div class="wrapper" id="mainarea">
-	<div class="alert alert-warning centered-axis-xy" style="min-height: 20px; display:none;">
-		
+	<div class="alert alert-warning centered-axis-xy" style="min-height: 20px; display:none;" role="alert" id="compilingmessage">
+		<div id='loadTasks'> </div>
 	</div>
 	<!-- The "tabindex=0" specifier on the canvas is important to allow it to capture keyboard focus when clicking on it with a mouse -->
 	<canvas tabindex=0 id="canvas" class="emscripten" oncontextmenu="event.preventDefault()" style="display:none;">
 </div>
-
-<!--<div class="row buttonarea text-center" id="buttonrow">-->
-<div class="row buttonarea text-center" id="buttonrow" style="display: none !important;"></div>
-	<div class="hide"><button type="button" id="fullscreen_request">FullScreen</button></div>
+<div class="row buttonarea text-center" id="buttonrow">
+	<div class="col-sm-2 text-center"></div>
+	<div class="col-sm-2 text-center"><button type="button" class="btn btn-primary" onclick="try { Module['pauseMainLoop'](); } catch(e) {console.error(e);}">Pause</button></div>
+	<div class="col-sm-2 text-center"><button type="button" class="btn btn-primary" onclick="try { Module['resumeMainLoop'](); } catch(e) {console.error(e);}">Resume</button></div>
+	<div class="col-sm-2 text-center"><button type="button" class="btn btn-primary" onclick="var w = document.getElementById('logwindow'); w.style.display = w.style.display ? '' : 'none';">Toggle Log</button></div>
+	<div class="col-sm-2 text-center"><button type="button" class="btn btn-primary" id='clear_indexeddb' onclick="try { deleteIndexedDBStorage(); } catch(e) {console.error(e);}">Clear IndexedDB</button></div>
+	<div class="col-sm-2 text-center"><button type="button" class="btn btn-primary" id="fullscreen_request">FullScreen</button></div>
+	<div class="col-sm-2 text-center"></div>
+	<div class="col-sm-2 text-center"></div>
 </div>
+<div class="texthalf text-normal jumbotron " id="logwindow" style='display:none'></div>
 
-
-
-
-
-
-<script src="SpeedSenseBase.UE4.js"></script>
-
+<script src="TelegramApp-HTML5-Shipping.UE4.js"></script>
 </body>
 </html>
