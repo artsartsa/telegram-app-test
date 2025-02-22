@@ -16,12 +16,15 @@
 // .../Engine/Source/Runtime/Engine/Private/ActiveSound.cpp
 //     // for velocity-based effects like doppler
 //     ParseParams.Velocity = (ParseParams.Transform.GetTranslation() - LastLocation) / DeltaTime;
+
+
 window.AudioContext = ( window.AudioContext || window.webkitAudioContext || null );
 if ( AudioContext ) {
 	var ue4_hacks = {}; // making this obvious...
 	ue4_hacks.ctx = new AudioContext();
 	ue4_hacks.panner = ue4_hacks.ctx.createPanner();
 	ue4_hacks.panner.__proto__.setVelocity = ( ue4_hacks.panner.__proto__.setVelocity || function(){} );
+	console.log(AudioContext);
 }
 
 
@@ -36,7 +39,7 @@ if ( AudioContext ) {
 // low enough that they do not strictly require WebGL 2.
 const requiredWebGLVersion = 1;
 
-const targetOffscreenCanvas = false;
+const targetOffscreenCanvas = true;
 
 // Add ?webgl1 GET param to explicitly test the WebGL 1 fallback version even if browser does support WebGL 2.
 const explicitlyUseWebGL1 = (location.search.indexOf('webgl1') != -1);
@@ -73,14 +76,14 @@ var Module = {
 	assetDownloadProgress: {}, // Track how many bytes of each needed asset has been downloaded so far.
 
 	UE4_indexedDBName: 'UE4_assetDatabase_TelegramApp', // this should be an ascii ID string without special characters that is unique to the project that is being packaged
-	UE4_indexedDBVersion: 202502212245, // Bump this number to invalidate existing IDB storages in browsers.
+	UE4_indexedDBVersion: 202501180403, // Bump this number to invalidate existing IDB storages in browsers.
 };
 
 
 
 
 // ================================================================================
-// *** HTML5 UE4 ***
+// *** HTML5 UE4 *** '-noaudiomixer','AudioDeviceModuleName=ALAudio'
 
 Module.arguments = ['../../../TelegramApp/TelegramApp.uproject','-stdout',];
 
@@ -104,7 +107,7 @@ var UE4 = {
 // ----------------------------------------
 // UE4 error and logging
 
-document.addEventListener('error', function(){document.getElementById('clear_indexeddb').style.display = 'inline-block';}, false);
+//document.addEventListener('error', function(){document.getElementById('clear_indexeddb').style.display = 'inline-block';}, false);
 
 function addLog(info, color) {
 	$("#logwindow").append("<h4><small>" + info + " </small></h4>");
@@ -268,7 +271,7 @@ function detectWebGL() {
 // Canvas scaling mode should be set to one of: 1=STRETCH, 2=ASPECT, or 3=FIXED.
 // This dictates how the canvas size changes when the browser window is resized
 // by dragging from the corner.
-var canvasWindowedScaleMode = 2 /*ASPECT*/;
+var canvasWindowedScaleMode = 1 /*STRETCH*/;
 
 // High DPI setting configures whether to match the canvas size 1:1 with
 // the physical pixels on the screen.
@@ -281,16 +284,16 @@ var canvasWindowedUseHighDpi = true;
 // If canvasWindowedScaleMode == 2 (ASPECT), this size defines only the aspect ratio
 //                                           that the canvas will be constrained to.
 // If canvasWindowedScaleMode == 1 (STRETCH), these size values are ignored.
-var canvasAspectRatioWidth = 1366;
-var canvasAspectRatioHeight = 768;
+var canvasAspectRatioWidth = 1920;
+var canvasAspectRatioHeight = 1080;
 
 
 // The resizeCanvas() function recomputes the canvas size on the page as the user changes
 // the browser window size.
 function resizeCanvas(aboutToEnterFullscreen) {
 	// Configuration variables, feel free to play around with these to tweak.
-	var minimumCanvasHeightCssPixels = 480; // the visible size of the canvas should always be at least this high (in CSS pixels)
-	var minimumCanvasHeightFractionOfBrowserWindowHeight = 0.65; // and also vertically take up this much % of the total browser client area height.
+	var minimumCanvasHeightCssPixels = 1; // the visible size of the canvas should always be at least this high (in CSS pixels)
+	var minimumCanvasHeightFractionOfBrowserWindowHeight = 1; // and also vertically take up this much % of the total browser client area height.
 
 	if (aboutToEnterFullscreen && !aboutToEnterFullscreen.type) { // UE4 engine is calling this function right before entering fullscreen?
 		// If you want to perform specific resolution setup here, do so by setting Module['canvas'].width x Module['canvas'].height now,
@@ -301,16 +304,16 @@ function resizeCanvas(aboutToEnterFullscreen) {
 
 	// The browser called resizeCanvas() to notify that we just entered fullscreen? In that case, we never react, since the strategy is
 	// to always set the canvas size right before entering fullscreen.
-	if (document.fullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement || document.msFullscreenElement) {
+	/*if (document.fullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement || document.msFullscreenElement) {
 		return;
-	}
+	}*/
 
 	var mainArea = document.getElementById('mainarea');
 	var canvasRect = mainArea.getBoundingClientRect();
 
 	// Compute the unconstrained size for the div that encloses the canvas, in CSS pixel units.
 	var cssWidth = canvasRect.right - canvasRect.left;
-	var cssHeight = Math.max(minimumCanvasHeightCssPixels, canvasRect.bottom - canvasRect.top, window.innerHeight * minimumCanvasHeightFractionOfBrowserWindowHeight);
+	var cssHeight = Math.max(minimumCanvasHeightCssPixels, canvasRect.bottom - canvasRect.top, window.innerHeight); //(minimumCanvasHeightCssPixels, canvasRect.bottom - canvasRect.top, window.innerHeight * minimumCanvasHeightFractionOfBrowserWindowHeight);
 
 	if (canvasWindowedScaleMode == 3/*NONE*/) {
 		// In fixed display mode, render to a statically determined WebGL render target size.
@@ -350,7 +353,7 @@ function resizeCanvas(aboutToEnterFullscreen) {
 //	emscripten_set_canvas_element_size_js(Module['canvas'].id, newRenderTargetWidth, newRenderTargetHeight);
 
 	Module['canvas'].style.width = cssWidth + 'px';
-	Module['canvas'].style.height = mainArea.style.height = cssHeight + 'px';
+	Module['canvas'].style.height = cssHeight + 'px';//mainArea.style.height = cssHeight + 'px';
 
 	// Tell the engine that the web page has changed the size of the WebGL render target on the canvas (Module['canvas'].width/height).
 	// This will update the GL viewport and propagate the change throughout the engine.
@@ -383,7 +386,7 @@ Module['UE4_wheelEvent'] = function(eventType, x, y, button, buttons, deltaX, de
 // 1=STRETCH: The canvas is resized to the size of the whole screen, potentially changing aspect ratio.
 // 2=ASPECT: The canvas is resized to the size of the whole screen, but retaining current aspect ratio.
 // 3=FIXED: The canvas is centered on screen with a fixed resolution.
-Module['UE4_fullscreenScaleMode'] = 1;//canvasWindowedScaleMode; // BUG: if using FIXED, fullscreen gets some strange padding on margin...
+Module['UE4_fullscreenScaleMode'] = 0;//canvasWindowedScaleMode; // BUG: if using FIXED, fullscreen gets some strange padding on margin...
 
 // When entering fullscreen mode, should UE4 engine resize the canvas?
 // 0=No resizing (do it manually in resizeCanvas()), 1=Resize to standard DPI, 2=Resize to highDPI
@@ -914,7 +917,7 @@ function download(url, responseType) {
 // ================================================================================
 // UE4 DEFAULT UX TEMPLATE
 
-function showErrorDialog(errorText) {
+function showErrorDialog(errorText) {/*
 	if ( errorText.indexOf('SyntaxError: ') != -1 ) { // this may be due to caching issue -- otherwise, compile time would have caught this
 		errorText = "NOTE: attempting to flush cache and force reload...<br>Please standby...";
 		setTimeout(function() {
@@ -929,15 +932,16 @@ function showErrorDialog(errorText) {
 		$('#mainarea').empty();
 		$('#mainarea').append('<div class="alert alert-danger centered-axis-xy" style ="min-height: 10pt" role="alert" id="errorDialog">' + errorText + '</div></div>');
 	}
+	*/
 }
 
-function showWarningRibbon(warningText) {
+function showWarningRibbon(warningText) {/*
 	var existingWarningDialog = document.getElementById('warningDialog');
 	if (existingWarningDialog) {
 		existingWarningDialog.innerHTML += '<br>' + warningText;
 	} else {
-		$('#buttonrow').prepend('<div class="alert alert-warning centered-axis-x" role="warning" id="warningDialog" style="padding-top:5px; padding-bottom: 5px">' + warningText + '</div></div>');
-	}
+		//$('#buttonrow').prepend('<div class="alert alert-warning centered-axis-x" role="warning" id="warningDialog" style="padding-top:5px; padding-bottom: 5px">' + warningText + '</div></div>');
+	}*/
 }
 
 // Given a blob, asynchronously reads the byte contents of that blob to an arraybuffer and returns it as a Promise.
@@ -985,7 +989,7 @@ function addScriptToDom(scriptCode) {
 
 function postRunEmscripten() {
 	taskFinished(TASK_MAIN);
-	$("#compilingmessage").remove();
+	//$("#compilingmessage").remove();
 
 	// The default Emscripten provided canvas resizing behavior is not needed,
 	// since we are controlling the canvas sizes here, so stub those functions out.
@@ -1017,7 +1021,8 @@ Module.postRun = [postRunEmscripten];
 // ----------------------------------------
 // MAIN
 
-$(document).ready(function() {
+//document.ready(function() {
+document.addEventListener("DOMContentLoaded", function() {
 
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	// Deduce which version to load up.

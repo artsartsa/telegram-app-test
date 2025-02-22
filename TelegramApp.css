@@ -7,22 +7,29 @@
  * - and put it in: "your project folder"/Build/HTML/GameX.css.template
  */
 
-html, body, .container {
+ html, body, .container {
 	height: 100%;
 	font-family: "Helvetica Neue", "HelveticaNeue", Helvetica, Arial, sans-serif;
+	margin: 0px;
+	overflow-y: hidden;
+	width: 100%;
+	padding: 0;
+	
 }
 
 .h4, h4 {
-	margin-top: 1pt;
-	margin-bottom: 1pt;
+
 	font-size: 10pt;
 }
 
 .container {
-	display: table;
-	vertical-align: middle;
-	border: 0px;
-	border-spacing: 0px;
+    width: 100vw; /* или 100% */
+    height: 100vh; /* или 100% */
+    margin: 0;
+    padding: 0;
+    position: absolute; /* или relative, зависит от вашего дизайна */
+    top: 0;
+    left: 0;
 }
 
 .glyphicon-spin {
@@ -49,61 +56,53 @@ html, body, .container {
 
 .wrapper {
 	position: relative;
-	margin: 1em auto 10px auto;
 	text-align: center;
 	min-width: 640px;
 	width: 100%;
-	height: 480px; /* initial height, will be dynamically adjusted at runtime */
-	max-width: 95%;
+	height: 100%; /* initial height, will be dynamically adjusted at runtime */
+	max-width: 100%;
 	display: block;
 	align-items: center;
-	position: relative;
+	position: sticky;
 	text-align: center;
 	justify-content: center;
 }
 
  .emscripten {
 	padding-right: 0;
-	margin-left: auto;
-	margin-right: auto;
-	display: block;
+	margin-left: 0;
+	margin-right: 0;
+	display: stretch;
 	display: -webkit-box;
 	display: -moz-box;
 	display: box;
 
 	-webkit-box-align: center;
 	-moz-box-align: center;
-	box-align: center;
+	box-align: stretch;
 
 	-webkit-box-pack: center;
 	-moz-box-pack: center;
 	box-pack: center;
 }
 
-#canvas:not([fullscreen]) {
+#canvas {
 	padding-right: 0;
-	margin-left: auto;
-	margin-right: auto;
+	margin-left: 0;
+	margin-right: 0;
 	width: 100%;
+	height: 100%;
 }
 
 .texthalf {
 	height: 37%;
 	border: 0px;
 	padding: 0px;
-	overflow-y: scroll;
+	overflow-y: hidden;
 	font-size: 2em;
 }
 
-.buttonarea {
-	min-height: 3%;
-	border-top: 0px;
-	border-bottom: 0px;
-	padding: 0px;
-	margin-right: 0px;
-	margin-top: 0px;
-	margin-bottom: 0px;
- }
+
 
 .btn { padding: 0px; text-align: center; min-width: 150px }
 .progress { background: rgba(245, 245, 245, 1); border: 0px solid rgba(245, 245, 245, 1); border-radius: 0px; height: 4px; }
@@ -114,4 +113,8 @@ html, body, .container {
 	top: 50%;
 	transform: translate(-50%,-50%);
 }
+
+.hide {
+	display: none;
+  }
 
