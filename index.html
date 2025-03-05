@@ -201,7 +201,8 @@ window.addEventListener('resize', () => {
 	</script>
 	
 	<script>
-		
+		setTimeout(Module['UE4_resizeCanvas'](), 1500)
+					
 		document.addEventListener("visibilitychange", function() {
 			if (document.hidden){
 				audioContext.suspend();

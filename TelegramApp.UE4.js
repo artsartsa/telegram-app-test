@@ -103,7 +103,43 @@ var UE4 = {
 	},
 };
 
+const touchableElement = document.getElementById('canvas');
+touchableElement.addEventListener('touchstart', registerTouch);
 
+function registerTouch(event)
+{
+	const mouseDownEvent = new MouseEvent('mousedown', {});
+	event.target.dispatchEvent(mouseDownEvent);
+	
+	touchableElement.removeEventListener('touchstart', registerTouch);
+	touchableElement.addEventListener('touchmove', handleTouchMove);
+}
+
+function handleTouchMove(event)
+{
+	// Handle touch move event
+    event.preventDefault();
+	
+	// Create and dispatch corresponding mousemove event
+	const mouseMoveEvent = new MouseEvent('mousemove', {
+	  clientX: event.touches[0].clientX,
+	  clientY: event.touches[0].clientY,
+	});
+	event.target.dispatchEvent(mouseMoveEvent);
+	
+	touchableElement.addEventListener('touchend', handleTouchEnd);
+}
+
+function handleTouchEnd(event)
+{
+	event.preventDefault();
+
+	// Create and dispatch corresponding mouseup event
+	const mouseUpEvent = new MouseEvent('mouseup', {});
+	event.target.dispatchEvent(mouseUpEvent);
+	
+	touchableElement.removeEventListener('touchend', handleTouchEnd);
+}
 // ----------------------------------------
 // UE4 error and logging
 
