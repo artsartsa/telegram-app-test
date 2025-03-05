@@ -284,7 +284,7 @@ var canvasWindowedUseHighDpi = true;
 // If canvasWindowedScaleMode == 2 (ASPECT), this size defines only the aspect ratio
 //                                           that the canvas will be constrained to.
 // If canvasWindowedScaleMode == 1 (STRETCH), these size values are ignored.
-var canvasAspectRatioWidth = 1920;
+var canvasAspectRatioWidth = 1080;
 var canvasAspectRatioHeight = 1080;
 
 
