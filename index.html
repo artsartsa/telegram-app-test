@@ -9,6 +9,13 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=100, heigh=100, initial-scale=1">
 
+	<style>
+        canvas {
+            width: 100%;
+            height: 100%;
+            touch-action: none;
+        }
+    </style>
 
 	<!-- Loading -->
 	 <script>
@@ -201,7 +208,7 @@ window.addEventListener('resize', () => {
 	</script>
 	
 	<script>
-		setTimeout(Module['UE4_resizeCanvas'](), 1500)
+		setTimeout(Module['UE4_resizeCanvas'](), 3500)
 					
 		document.addEventListener("visibilitychange", function() {
 			if (document.hidden){
@@ -344,6 +351,59 @@ loadingScreen.style.display = 'none';
 
 
 <script src="TelegramApp.UE4.js"></script>
+
+<canvas id="gameCanvas"></canvas>
+<script type="text/javascript" src="TelegramApp.js"></script> <!-- Ваш скомпилированный UE4 JS файл -->
+<script>
+	// Ожидание загрузки модуля Emscripten
+	Module.onRuntimeInitialized = function() {
+		const canvas = document.getElementById('gameCanvas');
+
+		// Функция для передачи координат в C++
+		function sendTouchEvent(touchType, x, y) {
+			if (typeof Module._OnTouchEvent === 'function') {
+				Module._OnTouchEvent(touchType, x, y);
+			} else {
+				console.error('OnTouchEvent function not found in Module');
+			}
+		}
+
+		// Обработка начала касания
+		canvas.addEventListener('touchstart', function(event) {
+			event.preventDefault();
+			const touch = event.touches[0];
+			const rect = canvas.getBoundingClientRect();
+			const x = touch.clientX - rect.left;
+			const y = touch.clientY - rect.top;
+			sendTouchEvent(0, x, y); // 0 - начало касания
+		});
+
+		// Обработка конца касания
+		canvas.addEventListener('touchend', function(event) {
+			event.preventDefault();
+			const touch = event.changedTouches[0];
+			const rect = canvas.getBoundingClientRect();
+			const x = touch.clientX - rect.left;
+			const y = touch.clientY - rect.top;
+			sendTouchEvent(1, x, y); // 1 - конец касания
+		});
+
+		// Опционально: отслеживание движения касания
+		canvas.addEventListener('touchmove', function(event) {
+			event.preventDefault();
+			const touch = event.touches[0];
+			const rect = canvas.getBoundingClientRect();
+			const x = touch.clientX - rect.left;
+			const y = touch.clientY - rect.top;
+			sendTouchEvent(2, x, y); // 2 - движение касания
+		});
+	};
+</script>
+
+
+
+
+
 
 </body>
 </html>
