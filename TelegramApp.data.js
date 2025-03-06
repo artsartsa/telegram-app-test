@@ -173,6 +173,6 @@ Module['FS_createPath']('/TelegramApp/Content', 'Paks', true, true);
   }
 
  }
- loadPackage({"files": [{"start": 0, "audio": 0, "end": 53, "filename": "/Manifest_NonUFSFiles_HTML5.txt"}, {"start": 53, "audio": 0, "end": 95, "filename": "/UE4CommandLine.txt"}, {"start": 95, "audio": 0, "end": 19832499, "filename": "/TelegramApp/Content/Paks/TelegramApp-HTML5.pak"}], "remote_package_size": 19832499, "package_uuid": "495f811d-a238-4246-ad8c-308dadb544bb"});
+ loadPackage({"files": [{"start": 0, "audio": 0, "end": 53, "filename": "/Manifest_NonUFSFiles_HTML5.txt"}, {"start": 53, "audio": 0, "end": 95, "filename": "/UE4CommandLine.txt"}, {"start": 95, "audio": 0, "end": 19832907, "filename": "/TelegramApp/Content/Paks/TelegramApp-HTML5.pak"}], "remote_package_size": 19832907, "package_uuid": "008f84d4-4501-4f83-973d-a67da639be73"});
 
 })();
